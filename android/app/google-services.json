@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "94152016720",
+    "project_id": "aroma-aura",
+    "storage_bucket": "aroma-aura.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:94152016720:android:e86538894a9bc0ba882255",
+        "android_client_info": {
+          "package_name": "com.example.perfumes_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDtrwCFk4h9gWpte2EdGOlwWSG4wVcIzRI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
