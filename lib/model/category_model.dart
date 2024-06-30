@@ -5,7 +5,7 @@ part 'category_model.g.dart';
 class Category {
   final String name;
   final String image;
-  final List<CategoryItem> items;
+  final Map<String, CategoryItem> items;
 
   Category({
     required this.name,

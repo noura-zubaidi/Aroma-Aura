@@ -1,15 +1,17 @@
-import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import 'dart:async';
+
+import 'package:flutter/material.dart';
 import 'package:perfumes_app/core/constants/colors.dart';
-import 'package:perfumes_app/model/category_model.dart';
-import 'package:perfumes_app/repo/categories_service.dart';
+import 'package:perfumes_app/view/screens/item_screen.dart';
+import 'package:perfumes_app/view/screens/purchase_screen.dart';
+import 'package:perfumes_app/view/widgets/categories_images.dart';
+import 'package:perfumes_app/view/widgets/category_widget.dart';
 import 'package:perfumes_app/view_model/categories_provider.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
@@ -28,10 +30,6 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _pageController = PageController(initialPage: 0);
     _startAutoPlay();
-
-    // Fetch categories when the screen is initialized
-    Future.microtask(() => Provider.of<CategoryProvider>(context, listen: false)
-        .fetchCategories());
   }
 
   @override
@@ -73,38 +71,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildCard(String image, String name) {
-    return Container(
-      margin: const EdgeInsets.all(10.0),
-      decoration: BoxDecoration(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Column(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(15),
-            child: Image.network(
-              image,
-              fit: BoxFit.fill,
-              height: 100,
-              width: 100,
-            ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            name,
-            style: const TextStyle(
-              fontFamily: 'LibreRegular',
-              fontSize: 16,
-              color: Colors.black,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -118,7 +84,14 @@ class _HomeScreenState extends State<HomeScreen> {
         centerTitle: true,
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MyPurchasedScreen(),
+                ),
+              );
+            },
             icon: Icon(
               Icons.shopping_cart,
               color: log1,
@@ -186,70 +159,102 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       body: Consumer<CategoryProvider>(
-        builder: (context, categoryProvider, child) {
-          if (categoryProvider.isLoading) {
-            return const Center(child: CircularProgressIndicator());
+        builder: (context, viewModel, child) {
+          if (viewModel.isLoading) {
+            return Center(
+                child: CircularProgressIndicator(
+              color: log1,
+            ));
+          }
+
+          if (viewModel.categories == null) {
+            return const Center(child: Text("No data available"));
           }
 
           return SingleChildScrollView(
-            child: Column(
-              children: [
-                SizedBox(
-                  height: 200,
-                  child: PageView.builder(
-                    controller: _pageController,
-                    onPageChanged: (int page) {
-                      setState(() {
-                        _currentPage = page;
-                      });
-                    },
-                    itemCount: imageUrls.length,
-                    itemBuilder: (context, index) {
-                      return Container(
-                        margin: const EdgeInsets.all(10.0),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[300],
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(30),
-                          child: Image.asset(
-                            imageUrls[index],
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                            height: double.infinity,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    for (int i = 0; i < imageUrls.length; i++)
-                      if (i == _currentPage) ...[_buildIndicator(true)] else
-                        _buildIndicator(false),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 1.2,
-                  ),
-                  itemCount: categoryProvider.categories.length,
+              child: Column(
+            children: [
+              SizedBox(
+                height: 200,
+                child: PageView.builder(
+                  controller: _pageController,
+                  onPageChanged: (int page) {
+                    setState(() {
+                      _currentPage = page;
+                    });
+                  },
+                  itemCount: imageUrls.length,
                   itemBuilder: (context, index) {
-                    final category = categoryProvider.categories[index];
-                    return _buildCard(category.image, category.name);
+                    return Container(
+                      margin: const EdgeInsets.all(10.0),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(30),
+                        child: Image.asset(
+                          imageUrls[index],
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: double.infinity,
+                        ),
+                      ),
+                    );
                   },
                 ),
-              ],
-            ),
-          );
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  for (int i = 0; i < imageUrls.length; i++)
+                    if (i == _currentPage) ...[_buildIndicator(true)] else
+                      _buildIndicator(false),
+                ],
+              ),
+              const SizedBox(height: 20),
+              GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 1.2,
+                ),
+                itemCount: viewModel.categories!.length,
+                itemBuilder: (BuildContext context, int index) {
+                  final category =
+                      viewModel.categories!.values.elementAt(index);
+
+                  return CategoryCard(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                ItemsScreen(category: category),
+                          ),
+                        );
+                      },
+                      image: category.image,
+                      name: category.name);
+                },
+              ),
+            ],
+          ));
         },
+      ),
+      floatingActionButton: ClipRRect(
+        borderRadius: BorderRadius.circular(30),
+        child: FloatingActionButton(
+          backgroundColor: log1,
+          onPressed: () {
+            context.read<CategoryProvider>().fetchCategories();
+          },
+          child: const Icon(
+            Icons.refresh,
+            color: Colors.white,
+          ),
+        ),
       ),
     );
   }

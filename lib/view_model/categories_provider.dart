@@ -1,24 +1,24 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:perfumes_app/model/category_model.dart';
 import 'package:perfumes_app/repo/categories_service.dart';
 
 class CategoryProvider with ChangeNotifier {
-  final CategoryService categoryService;
-  List<Category> _categories = [];
+  final ApiService _apiService;
+  Map<String, Category>? _categories;
   bool _isLoading = false;
 
-  CategoryProvider(this.categoryService);
-
-  List<Category> get categories => _categories;
   bool get isLoading => _isLoading;
+  Map<String, Category>? get categories => _categories;
+
+  CategoryProvider() : _apiService = ApiService(CategoryService(Dio()));
 
   Future<void> fetchCategories() async {
     _isLoading = true;
     notifyListeners();
 
     try {
-      final fetchedCategories = await categoryService.getCategories();
-      _categories = fetchedCategories;
+      _categories = await _apiService.getCategories();
     } catch (error) {
       print("Error fetching categories: $error");
     } finally {

@@ -8,5 +8,19 @@ abstract class CategoryService {
   factory CategoryService(Dio dio, {String baseUrl}) = _CategoryService;
 
   @GET("/categories.json")
-  Future<List<Category>> getCategories();
+  Future<Map<String, Category>> getCategories();
+}
+
+class ApiService {
+  final CategoryService _categoryService;
+
+  ApiService(this._categoryService);
+
+  Future<Map<String, Category>> getCategories() async {
+    try {
+      return await _categoryService.getCategories();
+    } catch (e) {
+      throw e;
+    }
+  }
 }

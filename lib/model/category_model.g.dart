@@ -9,9 +9,9 @@ part of 'category_model.dart';
 Category _$CategoryFromJson(Map<String, dynamic> json) => Category(
       name: json['name'] as String,
       image: json['image'] as String,
-      items: (json['items'] as List<dynamic>)
-          .map((e) => CategoryItem.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      items: (json['items'] as Map<String, dynamic>).map(
+        (k, e) => MapEntry(k, CategoryItem.fromJson(e as Map<String, dynamic>)),
+      ),
     );
 
 Map<String, dynamic> _$CategoryToJson(Category instance) => <String, dynamic>{

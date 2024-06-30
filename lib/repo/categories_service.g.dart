@@ -21,20 +21,20 @@ class _CategoryService implements CategoryService {
   String? baseUrl;
 
   @override
-  Future<List<Category>> getCategories() async {
+  Future<Map<String, Category>> getCategories() async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final Map<String, dynamic>? _data = null;
-    final _result =
-        await _dio.fetch<List<dynamic>>(_setStreamType<List<Category>>(Options(
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<Map<String, Category>>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
     )
             .compose(
               _dio.options,
-              'categories.json',
+              '/categories.json',
               queryParameters: queryParameters,
               data: _data,
             )
@@ -43,9 +43,8 @@ class _CategoryService implements CategoryService {
               _dio.options.baseUrl,
               baseUrl,
             ))));
-    var value = _result.data!
-        .map((dynamic i) => Category.fromJson(i as Map<String, dynamic>))
-        .toList();
+    var value = _result.data!.map((k, dynamic v) =>
+        MapEntry(k, Category.fromJson(v as Map<String, dynamic>)));
     return value;
   }
 
