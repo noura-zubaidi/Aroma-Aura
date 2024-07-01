@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:perfumes_app/core/constants/colors.dart';
 import 'package:perfumes_app/view/screens/home_screen.dart';
+import 'package:perfumes_app/view/screens/signing_info.dart';
 import 'package:perfumes_app/view_model/authentication.dart';
 
-class OtpScreen extends StatefulWidget {
+class OtpSignupScreen extends StatefulWidget {
   final String phone;
 
-  OtpScreen({required this.phone});
+  OtpSignupScreen({required this.phone});
 
   @override
-  _OtpScreenState createState() => _OtpScreenState();
+  _OtpSignupScreenState createState() => _OtpSignupScreenState();
 }
 
-class _OtpScreenState extends State<OtpScreen> {
+class _OtpSignupScreenState extends State<OtpSignupScreen> {
   bool _isLoading = false;
   TextEditingController _otpController = TextEditingController();
 
@@ -29,12 +30,11 @@ class _OtpScreenState extends State<OtpScreen> {
 
     try {
       await AuthService.loginWithOtp(otp: _otpController.text);
-      // Navigate to the home screen or another screen
+
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => HomeScreen()),
+        MaterialPageRoute(builder: (context) => SigningInfo()),
       );
     } catch (e) {
-      // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.toString())),
       );

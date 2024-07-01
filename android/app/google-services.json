@@ -13,7 +13,20 @@
           "package_name": "com.example.perfumes_app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "94152016720-00lcha78q17bf5mb0o4c829ejr7aqp81.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.perfumes_app",
+            "certificate_hash": "d328eb1a2fba6cd9fe2270f6cc6c84225952129f"
+          }
+        },
+        {
+          "client_id": "94152016720-55h2jq7g4s727rbbh0nv1ks7gms4d3kf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDtrwCFk4h9gWpte2EdGOlwWSG4wVcIzRI"
@@ -21,7 +34,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "94152016720-55h2jq7g4s727rbbh0nv1ks7gms4d3kf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

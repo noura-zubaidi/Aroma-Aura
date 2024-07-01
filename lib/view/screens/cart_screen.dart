@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:perfumes_app/core/constants/colors.dart';
 import 'package:perfumes_app/model/category_model.dart';
 import 'package:perfumes_app/model/purchased_model.dart';
@@ -33,17 +34,16 @@ class _CartScreenState extends State<CartScreen> {
 
   void _addToCart() {
     final purchasedItem = PurchasedItem(
-      name: widget.item.name,
+      itemName: widget.item.name,
       image: widget.item.image,
       price: widget.item.price,
       description: widget.item.description,
       quantity: _quantity,
     );
 
-    // Save the purchased item
-    PurchasedItemsProvider().addPurchasedItem(purchasedItem);
+    final box = Hive.box<PurchasedItem>('cartBox');
+    box.add(purchasedItem);
 
-    // Navigate to MyPurchasedScreen
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -64,8 +64,7 @@ class _CartScreenState extends State<CartScreen> {
         ),
         centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -76,13 +75,14 @@ class _CartScreenState extends State<CartScreen> {
               widget.item.name,
               style: const TextStyle(
                 fontFamily: 'LibreRegular',
-                fontSize: 24,
+                fontSize: 25,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              widget.item.description,
+              textAlign: TextAlign.center,
+              'About Product:\n ${widget.item.description}',
               style: const TextStyle(
                 fontFamily: 'LibreRegular',
                 fontSize: 16,
@@ -98,19 +98,33 @@ class _CartScreenState extends State<CartScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.remove),
-                  onPressed: _decrementQuantity,
-                ),
-                Text('$_quantity', style: const TextStyle(fontSize: 20)),
-                IconButton(
-                  icon: const Icon(Icons.add),
-                  onPressed: _incrementQuantity,
-                ),
-              ],
+            Container(
+              width: 200,
+              height: 50,
+              decoration: BoxDecoration(
+                  color: log1, borderRadius: BorderRadius.circular(30)),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    icon: const Icon(
+                      Icons.remove,
+                      color: Colors.white,
+                    ),
+                    onPressed: _decrementQuantity,
+                  ),
+                  Text('$_quantity',
+                      style:
+                          const TextStyle(fontSize: 20, color: Colors.white)),
+                  IconButton(
+                    icon: const Icon(
+                      Icons.add,
+                      color: Colors.white,
+                    ),
+                    onPressed: _incrementQuantity,
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 32),
             SizedBox(
@@ -128,7 +142,7 @@ class _CartScreenState extends State<CartScreen> {
                   'Add to Cart',
                   style: TextStyle(
                     fontFamily: 'LibreRegular',
-                    fontSize: 17,
+                    fontSize: 18,
                     fontWeight: FontWeight.w600,
                     color: log1,
                   ),

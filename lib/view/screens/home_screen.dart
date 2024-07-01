@@ -2,10 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:perfumes_app/core/constants/colors.dart';
+import 'package:perfumes_app/core/state_management/user_session.dart';
 import 'package:perfumes_app/view/screens/item_screen.dart';
+import 'package:perfumes_app/view/screens/login_screen.dart';
+import 'package:perfumes_app/view/screens/profile_screen.dart';
 import 'package:perfumes_app/view/screens/purchase_screen.dart';
 import 'package:perfumes_app/view/widgets/categories_images.dart';
 import 'package:perfumes_app/view/widgets/category_widget.dart';
+import 'package:perfumes_app/view_model/authentication.dart';
 import 'package:perfumes_app/view_model/categories_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -15,6 +19,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final AuthService _authService = AuthService();
   late PageController _pageController;
   int _currentPage = 0;
   late Timer _timer;
@@ -71,6 +76,15 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  void _logout() async {
+    await AuthService.logout();
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => LoginScreen()),
+    );
+    await UserSessionManager.clearUserSession();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -120,6 +134,10 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             ListTile(
+              onTap: () {
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => ProfileScreen()));
+              },
               leading: Icon(
                 Icons.account_circle,
                 color: log1,
@@ -144,6 +162,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             ListTile(
+              onTap: _logout,
               leading: Icon(
                 Icons.logout_rounded,
                 color: log1,
@@ -168,7 +187,13 @@ class _HomeScreenState extends State<HomeScreen> {
           }
 
           if (viewModel.categories == null) {
-            return const Center(child: Text("No data available"));
+            return const Center(
+                child: Text(
+              "No data available",
+              style: TextStyle(
+                fontFamily: 'LibreRegular',
+              ),
+            ));
           }
 
           return SingleChildScrollView(

@@ -1,21 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:perfumes_app/core/constants/colors.dart';
-import 'package:perfumes_app/view/screens/home_screen.dart';
+import 'package:perfumes_app/view/screens/login_screen.dart';
 import 'package:perfumes_app/view/screens/otp_screen.dart';
-import 'package:perfumes_app/view/screens/signup_screen.dart';
+import 'package:perfumes_app/view/screens/signing_info.dart';
 import 'package:perfumes_app/view_model/authentication.dart';
 
-class LoginScreen extends StatefulWidget {
-  LoginScreen({super.key});
+class SignupScreen extends StatefulWidget {
+  SignupScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<SignupScreen> createState() => _SignupScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _SignupScreenState extends State<SignupScreen> {
   final GlobalKey<FormState> _formkey = GlobalKey();
   late TextEditingController _phoneController;
-
   @override
   void initState() {
     super.initState();
@@ -28,10 +27,10 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _signInWithGoogle() async {
-    await AuthService.signInWithGoogle();
-    Navigator.of(context)
-        .pushReplacement(MaterialPageRoute(builder: (context) => HomeScreen()));
+  void _signUpWithGoogle() async {
+    await AuthService.signUpWithGoogle();
+    Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => SigningInfo()));
   }
 
   void _sendOtp() async {
@@ -71,7 +70,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const Padding(
                   padding: EdgeInsets.only(top: 60, left: 15),
                   child: Text(
-                    'Welcome Back',
+                    'Welcome to Aroma Aura',
                     style: TextStyle(
                       color: Colors.white,
                       fontFamily: 'LibreRegular',
@@ -146,10 +145,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             onTap: () {
                               Navigator.of(context).pushReplacement(
                                   MaterialPageRoute(
-                                      builder: (context) => SignupScreen()));
+                                      builder: (context) => LoginScreen()));
                             },
                             child: const Text(
-                              'Don\'t Have An Account? Sign Up',
+                              'Already Have An Account? Sign Up',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w500,
@@ -206,7 +205,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           padding: EdgeInsets.zero,
                           shape: const CircleBorder(),
                         ),
-                        onPressed: _signInWithGoogle,
+                        onPressed: _signUpWithGoogle,
                         child: Image.network(
                           "https://i.pinimg.com/originals/39/21/6d/39216d73519bca962bd4a01f3e8f4a4b.png",
                           width: 30,
