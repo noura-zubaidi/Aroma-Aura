@@ -29,4 +29,25 @@ class PurchasedItem extends HiveObject {
     required this.description,
     required this.quantity,
   });
+  Map<String, dynamic> toMap() {
+    return {
+      'itemId': itemId,
+      'itemName': itemName,
+      'image': image,
+      'price': price,
+      'description': description,
+      'quantity': quantity,
+    };
+  }
+
+  factory PurchasedItem.fromMap(Map<dynamic, dynamic> map) {
+    return PurchasedItem(
+      itemId: map['itemId'],
+      itemName: map['itemName'],
+      image: map['image'],
+      price: map['price'],
+      description: map['description'],
+      quantity: map['quantity'],
+    );
+  }
 }

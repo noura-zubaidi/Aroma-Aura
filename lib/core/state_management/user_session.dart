@@ -1,3 +1,4 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:perfumes_app/data/hive_helper.dart';
 import 'package:perfumes_app/model/user_model.dart';
@@ -52,6 +53,18 @@ class UserSessionManager {
   // Get the current user from Hive
   static Future<UserModel?> getUser() async {
     final uid = await getUserUid();
-    return uid != null ? HiveHelper.getUser(uid) : null;
+    if (uid != null) {
+      DatabaseReference databaseReference =
+          FirebaseDatabase.instance.ref().child("users").child("users/$uid");
+      final DatabaseEvent event = await databaseReference.once();
+      final DataSnapshot snapshot = event.snapshot;
+
+      if (snapshot.exists) {
+        Map<String, dynamic> userData =
+            Map<String, dynamic>.from(snapshot.value as Map);
+        return UserModel.fromMap(userData);
+      }
+    }
+    return null;
   }
 }

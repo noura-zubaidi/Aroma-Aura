@@ -37,12 +37,24 @@ class HiveHelper {
     return cartBox.get(id);
   }
 
-  static Future<void> removePurchasedItem(String id) async {
-    await cartBox.delete(id);
+  static Future<void> removePurchasedItem(String itemId) async {
+    final box = Hive.box<PurchasedItem>('cartBox');
+    final item = box.values.firstWhere((element) => element.itemId == itemId);
+    await item.delete();
   }
 
   static Future<void> clearUserBox() async {
     await userBox.clear();
+  }
+
+  static Future<void> updateUser(UserModel user) async {
+    final box = await Hive.openBox<UserModel>('userBox');
+    await box.put(user.uid, user);
+    print("User data updated in Hive.");
+  }
+
+  static Future<void> closeCartBox() async {
+    await cartBox.close();
   }
 
   static Future<void> clearCartBox() async {

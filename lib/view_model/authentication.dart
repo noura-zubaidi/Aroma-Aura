@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:perfumes_app/core/state_management/user_session.dart';
 import 'package:perfumes_app/data/hive_helper.dart';
@@ -23,7 +24,7 @@ class AuthService {
         final UserCredential userCredential =
             await _auth.signInWithCredential(phoneAuthCredential);
         if (userCredential.user != null) {
-          await saveUserToHive(userCredential.user!, phoneNumber: phone);
+          await saveUserToDatabase(userCredential.user!, phoneNumber: phone);
           await UserSessionManager.saveUserSession(userCredential.user!.uid);
         }
       },
@@ -50,7 +51,7 @@ class AuthService {
     try {
       final user = await _auth.signInWithCredential(cred);
       if (user.user != null) {
-        await saveUserToHive(user.user!);
+        await saveUserToDatabase(user.user!);
         await UserSessionManager.saveUserSession(user.user!.uid);
       }
     } on FirebaseAuthException catch (e) {
@@ -60,7 +61,7 @@ class AuthService {
     }
   }
 
-  static Future<void> saveUserToHive(User user,
+  static Future<void> saveUserToDatabase(User user,
       {String? name, String? phoneNumber}) async {
     UserModel appUser = UserModel(
       uid: user.uid,
@@ -69,8 +70,34 @@ class AuthService {
       email: user.email,
     );
 
-    await HiveHelper.addUser(appUser);
-    print("User data saved to Hive.");
+    await saveUserToRealtimeDatabase(appUser);
+    print("User data saved to real-time database.");
+  }
+
+  static Future<void> saveUserToRealtimeDatabase(UserModel user) async {
+    DatabaseReference databaseReference =
+        FirebaseDatabase.instance.ref().child("users").child(user.uid!);
+    await databaseReference.set(user.toMap());
+    print('User data saved in real-time database');
+  }
+
+  static Future<UserModel?> getUserInfoFromRealtimeDatabase() async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      return null;
+    }
+
+    final databaseReference =
+        FirebaseDatabase.instance.ref().child('users/${user.uid}');
+    final DatabaseEvent event = await databaseReference.once();
+    final DataSnapshot snapshot = event.snapshot;
+
+    if (snapshot.exists) {
+      final Map<String, dynamic> userData =
+          Map<String, dynamic>.from(snapshot.value as Map);
+      return UserModel.fromMap(userData);
+    }
+    return null;
   }
 
   static Future<void> logout() async {
@@ -82,37 +109,8 @@ class AuthService {
     return await UserSessionManager.getUser();
   }
 
-  static Future<void> saveUserInfo(
-      String name, String phoneNumber, String password) async {
-    User? user = _auth.currentUser;
-    if (user != null) {
-      await saveUserToHive(user, name: name, phoneNumber: phoneNumber);
-      await UserSessionManager.saveUserSession(user.uid);
-    }
-  }
-
-  static Future<bool> isLoggedin() async {
+  static Future<bool> isLoggedIn() async {
     return await UserSessionManager.isUserLoggedIn();
-  }
-
-  static Future<String> signupWithEmailAndPassword({
-    required String email,
-    required String password,
-  }) async {
-    try {
-      UserCredential userCredential =
-          await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      await saveUserToHive(userCredential.user!);
-      await UserSessionManager.saveUserSession(userCredential.user!.uid);
-      return 'Success';
-    } on FirebaseAuthException catch (e) {
-      return e.message.toString();
-    } catch (e) {
-      return e.toString();
-    }
   }
 
   static Future<void> signInWithGoogle() async {
@@ -132,7 +130,7 @@ class AuthService {
         final UserCredential userCredential =
             await _auth.signInWithCredential(credential);
         if (userCredential.user != null) {
-          await saveUserToHive(userCredential.user!);
+          await saveUserToDatabase(userCredential.user!);
           await UserSessionManager.saveUserSession(userCredential.user!.uid);
         }
       } on FirebaseAuthException catch (e) {
@@ -147,27 +145,6 @@ class AuthService {
     await signInWithGoogle();
   }
 
-  // Method for logging in with email and password
-  static Future<String> loginWithEmailAndPassword({
-    required String email,
-    required String password,
-  }) async {
-    try {
-      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      await saveUserToHive(userCredential.user!);
-      await UserSessionManager.saveUserSession(userCredential.user!.uid);
-      return 'Success';
-    } on FirebaseAuthException catch (e) {
-      return e.message.toString();
-    } catch (e) {
-      return e.toString();
-    }
-  }
-
-  // Method for verifying phone number
   Future<void> verifyPhoneNumber(
     String phoneNumber,
     Function(PhoneAuthCredential) verificationCompleted,
@@ -184,20 +161,31 @@ class AuthService {
     );
   }
 
-  // Method for signing in with phone auth credential
   Future<void> signInWithPhoneAuthCredential(
       PhoneAuthCredential phoneAuthCredential) async {
     await _auth.signInWithCredential(phoneAuthCredential);
   }
 
-  // Method for getting the current user
   User? getCurrentUser() {
     return _auth.currentUser;
   }
 
-  // Method for signing out
-  Future<void> signOut() async {
-    await _auth.signOut();
-    await UserSessionManager.clearUserSession();
+  static Future<void> updateUserRealTime(UserModel user) async {
+    DatabaseReference databaseReference =
+        FirebaseDatabase.instance.ref().child("users").child(user.uid!);
+    await databaseReference.update(user.toMap());
+    print('User info updated in real-time database');
+  }
+
+  static Future<void> updateUserInfo(String uid,
+      {String? name, String? phoneNumber}) async {
+    UserModel? user = await getUserInfoFromRealtimeDatabase();
+    if (user != null) {
+      if (name != null) user.name = name;
+      if (phoneNumber != null) user.phoneNumber = phoneNumber;
+
+      await updateUserRealTime(user);
+      print("User data updated in real-time database");
+    }
   }
 }

@@ -41,8 +41,10 @@ class _SigningInfoState extends State<SigningInfo> {
           phoneNumber: _phoneController.text,
           email: user.email,
         );
-        await AuthService.saveUserToHive(user,
-            phoneNumber: _phoneController.text);
+        await AuthService.saveUserToDatabase(
+          user,
+          phoneNumber: _phoneController.text,
+        );
 
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => HomeScreen()),

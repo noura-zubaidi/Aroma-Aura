@@ -29,12 +29,11 @@ class _OtpScreenState extends State<OtpScreen> {
 
     try {
       await AuthService.loginWithOtp(otp: _otpController.text);
-      // Navigate to the home screen or another screen
+
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => HomeScreen()),
       );
     } catch (e) {
-      // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.toString())),
       );
