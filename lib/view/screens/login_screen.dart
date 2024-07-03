@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:perfumes_app/core/constants/colors.dart';
-import 'package:perfumes_app/view/screens/home_screen.dart';
-import 'package:perfumes_app/view/screens/otp_screen.dart';
-import 'package:perfumes_app/view/screens/signup_screen.dart';
-import 'package:perfumes_app/view_model/authentication.dart';
+import 'package:perfumes_app/data/auth_helpers.dart';
 
 class LoginScreen extends StatefulWidget {
   LoginScreen({super.key});
@@ -26,32 +23,6 @@ class _LoginScreenState extends State<LoginScreen> {
   void dispose() {
     _phoneController.dispose();
     super.dispose();
-  }
-
-  void _signInWithGoogle() async {
-    await AuthService.signInWithGoogle();
-    Navigator.of(context)
-        .pushReplacement(MaterialPageRoute(builder: (context) => HomeScreen()));
-  }
-
-  void _sendOtp() async {
-    if (_formkey.currentState!.validate()) {
-      AuthService.sentOtp(
-        phone: _phoneController.text,
-        errorStep: () {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text('Failed to send OTP')));
-        },
-        nextStep: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => OtpScreen(phone: _phoneController.text),
-            ),
-          );
-        },
-      );
-    }
   }
 
   @override
@@ -120,7 +91,13 @@ class _LoginScreenState extends State<LoginScreen> {
                             width: double.infinity,
                             height: 50,
                             child: ElevatedButton(
-                              onPressed: _sendOtp,
+                              onPressed: () {
+                                sendOtp(
+                                  context: context,
+                                  phoneController: _phoneController,
+                                  formKey: _formkey,
+                                );
+                              },
                               style: ElevatedButton.styleFrom(
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(30),
@@ -144,9 +121,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           padding: const EdgeInsets.all(5),
                           child: InkWell(
                             onTap: () {
-                              Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(
-                                      builder: (context) => SignupScreen()));
+                              navigateToSignupScreen(
+                                context: context,
+                                phoneController: _phoneController,
+                              );
                             },
                             child: const Text(
                               'Don\'t Have An Account? Sign Up',
@@ -206,7 +184,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           padding: EdgeInsets.zero,
                           shape: const CircleBorder(),
                         ),
-                        onPressed: _signInWithGoogle,
+                        onPressed: () {
+                          signInWithGoogle(context);
+                        },
                         child: Image.network(
                           "https://i.pinimg.com/originals/39/21/6d/39216d73519bca962bd4a01f3e8f4a4b.png",
                           width: 30,

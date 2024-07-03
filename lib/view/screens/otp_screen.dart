@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:perfumes_app/core/constants/colors.dart';
-import 'package:perfumes_app/view/screens/home_screen.dart';
+
+import 'package:perfumes_app/view/screens/signing_info.dart';
 import 'package:perfumes_app/view_model/authentication.dart';
 
 class OtpScreen extends StatefulWidget {
@@ -31,7 +32,12 @@ class _OtpScreenState extends State<OtpScreen> {
       await AuthService.loginWithOtp(otp: _otpController.text);
 
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => HomeScreen()),
+        MaterialPageRoute(
+          builder: (context) => SigningInfo(
+            phone: widget.phone,
+            isGoogleSignUp: false,
+          ),
+        ),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -60,23 +66,22 @@ class _OtpScreenState extends State<OtpScreen> {
                     fontFamily: 'LibreRegular',
                     fontSize: 30,
                     fontWeight: FontWeight.w700)),
-            const SizedBox(
-              height: 20,
-            ),
+            const SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 90),
               child: TextField(
-                  controller: _otpController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                      labelText: 'OTP',
-                      labelStyle: TextStyle(
-                          fontFamily: 'LibreRegular',
-                          fontSize: 14,
-                          color: Colors.white),
-                      focusedBorder: OutlineInputBorder(
-                          borderSide:
-                              BorderSide(color: Colors.white, width: 1)))),
+                controller: _otpController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: 'OTP',
+                  labelStyle: TextStyle(
+                      fontFamily: 'LibreRegular',
+                      fontSize: 14,
+                      color: Colors.white),
+                  focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white, width: 1)),
+                ),
+              ),
             ),
             const SizedBox(height: 20),
             _isLoading
@@ -89,15 +94,15 @@ class _OtpScreenState extends State<OtpScreen> {
                     style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30)),
-                        backgroundColor: Colors.white,
-                        fixedSize: const Size(200, 55)),
+                        backgroundColor: Colors.white),
                     child: Text(
                       'Verify OTP',
                       style: TextStyle(
-                          fontFamily: 'LibreRegular',
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: log1),
+                        fontFamily: 'LibreRegular',
+                        fontSize: 19,
+                        fontWeight: FontWeight.w600,
+                        color: log1,
+                      ),
                     ),
                   ),
           ],

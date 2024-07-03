@@ -12,36 +12,30 @@ class MyPurchasedScreen extends StatefulWidget {
 }
 
 class _MyPurchasedScreenState extends State<MyPurchasedScreen> {
-  final OrdersService _ordersService =
-      OrdersService(); // Instantiate OrdersService
+  final OrdersService _ordersService = OrdersService();
 
   @override
   void initState() {
     super.initState();
     HiveHelper.init();
-    _fetchPurchasedItems(); // Fetch purchased items from Firebase
+    _fetchPurchasedItems();
   }
 
-  // Fetch purchased items from Firebase and add them to Hive
   Future<void> _fetchPurchasedItems() async {
     final purchasedItems = await _ordersService.getAllOrders();
     final box = Hive.box<PurchasedItem>('cartBox');
 
+    await HiveHelper.clearCartBox();
+
     for (var item in purchasedItems) {
-      // Only add items that are not already in the Hive box
-      if (box.values.any((element) => element.itemId == item.itemId)) {
-        continue;
-      }
       await HiveHelper.addPurchasedItem(item);
     }
 
-    setState(() {}); // Refresh the UI
+    setState(() {});
   }
 
-  // Handle checkout functionality
   Future<void> _handleCheckout() async {
-    final box = Hive.box<PurchasedItem>('cartBox'); // Get the cart box
-
+    final box = Hive.box<PurchasedItem>('cartBox');
     if (box.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -51,12 +45,11 @@ class _MyPurchasedScreenState extends State<MyPurchasedScreen> {
       return;
     }
 
-    // Get the list of items to delete
     final itemsToDelete = box.values.toList();
     for (var item in itemsToDelete) {
-      await _ordersService.deleteOrder(item.itemId!); // Remove from Firebase
+      await _ordersService.deleteOrder(item.itemId!);
     }
-    await HiveHelper.clearCartBox(); // Clear local Hive cart box
+    await HiveHelper.clearCartBox();
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -64,7 +57,6 @@ class _MyPurchasedScreenState extends State<MyPurchasedScreen> {
       ),
     );
 
-    // Optionally, refresh the purchased items list from Firebase
     await _fetchPurchasedItems();
   }
 
@@ -98,10 +90,8 @@ class _MyPurchasedScreenState extends State<MyPurchasedScreen> {
                         key: ValueKey(item.itemId),
                         direction: DismissDirection.endToStart,
                         onDismissed: (direction) async {
-                          await _ordersService.deleteOrder(
-                              item.itemId!); // Remove from Firebase
-                          await HiveHelper.removePurchasedItem(
-                              item.itemId!); // Remove from local Hive storage
+                          await _ordersService.deleteOrder(item.itemId!);
+                          await HiveHelper.removePurchasedItem(item.itemId!);
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text('${item.itemName} removed'),
@@ -154,7 +144,7 @@ class _MyPurchasedScreenState extends State<MyPurchasedScreen> {
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
-                      onPressed: _handleCheckout, // Call the checkout method
+                      onPressed: _handleCheckout,
                       style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),

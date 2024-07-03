@@ -167,7 +167,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       GestureDetector(
                         onDoubleTap: _showEditDialog,
                         child: Text(
-                          'Phone Number: ${_user!.phoneNumber}',
+                          'Phone Number: +962 ${_user!.phoneNumber}',
                           style: const TextStyle(
                             fontFamily: 'LibreRegular',
                             fontSize: 15,

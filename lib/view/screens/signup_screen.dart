@@ -6,7 +6,8 @@ import 'package:perfumes_app/view/screens/signing_info.dart';
 import 'package:perfumes_app/view_model/authentication.dart';
 
 class SignupScreen extends StatefulWidget {
-  SignupScreen({super.key});
+  final String phone;
+  SignupScreen({required this.phone});
 
   @override
   State<SignupScreen> createState() => _SignupScreenState();
@@ -28,9 +29,12 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   void _signUpWithGoogle() async {
-    await AuthService.signUpWithGoogle();
-    Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => SigningInfo()));
+    await AuthService.signInWithGoogle();
+    Navigator.of(context).pushReplacement(MaterialPageRoute(
+        builder: (context) => SigningInfo(
+              phone: widget.phone,
+              isGoogleSignUp: true,
+            )));
   }
 
   void _sendOtp() async {

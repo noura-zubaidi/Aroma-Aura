@@ -1,16 +1,15 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
+import 'package:perfumes_app/core/constants/ads_images.dart';
 import 'package:perfumes_app/core/constants/colors.dart';
-import 'package:perfumes_app/core/state_management/user_session.dart';
+import 'package:perfumes_app/data/auth_helpers.dart';
 import 'package:perfumes_app/view/screens/item_screen.dart';
-import 'package:perfumes_app/view/screens/login_screen.dart';
-import 'package:perfumes_app/view/screens/profile_screen.dart';
 import 'package:perfumes_app/view/screens/purchase_screen.dart';
-import 'package:perfumes_app/view/widgets/categories_images.dart';
 import 'package:perfumes_app/view/widgets/category_widget.dart';
+import 'package:perfumes_app/view/widgets/custom_drawer.dart';
+import 'package:perfumes_app/view/widgets/indicator_widget.dart';
 import 'package:perfumes_app/view_model/authentication.dart';
 import 'package:perfumes_app/view_model/categories_provider.dart';
+import 'package:perfumes_app/view_model/indicator_logic.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -22,67 +21,22 @@ class _HomeScreenState extends State<HomeScreen> {
   final AuthService _authService = AuthService();
   late PageController _pageController;
   int _currentPage = 0;
-  late Timer _timer;
-
-  final List<String> imageUrls = [
-    'assets/images/ads1.png',
-    'assets/images/ads2.png',
-    'assets/images/ads3.png',
-  ];
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: 0);
-    _startAutoPlay();
+    startAutoPlay(_pageController, _currentPage, (int page) {
+      setState(() {
+        _currentPage = page;
+      });
+    });
   }
 
   @override
   void dispose() {
     _pageController.dispose();
-    _timer.cancel();
     super.dispose();
-  }
-
-  void _startAutoPlay() {
-    _timer = Timer.periodic(Duration(seconds: 3), (Timer timer) {
-      if (_currentPage < imageUrls.length - 1) {
-        setState(() {
-          _currentPage++;
-        });
-      } else {
-        setState(() {
-          _currentPage = 0;
-        });
-      }
-      _pageController.animateToPage(
-        _currentPage,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-      );
-    });
-  }
-
-  Widget _buildIndicator(bool isActive) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      margin: const EdgeInsets.symmetric(horizontal: 5.0),
-      height: isActive ? 10.0 : 8.0,
-      width: isActive ? 10.0 : 8.0,
-      decoration: BoxDecoration(
-        color: isActive ? const Color(0XCDa4455c) : Colors.grey,
-        borderRadius: const BorderRadius.all(Radius.circular(5)),
-      ),
-    );
-  }
-
-  void _logout() async {
-    await AuthService.logout();
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => LoginScreen()),
-    );
-    await UserSessionManager.clearUserSession();
   }
 
   @override
@@ -116,66 +70,8 @@ class _HomeScreenState extends State<HomeScreen> {
           color: log1,
         ),
       ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              decoration: BoxDecoration(
-                color: log1,
-              ),
-              child: const Text(
-                'Aroma Aura',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontFamily: 'LibreRegular',
-                  fontSize: 24,
-                ),
-              ),
-            ),
-            ListTile(
-              onTap: () {
-                Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => ProfileScreen()));
-              },
-              leading: Icon(
-                Icons.account_circle,
-                color: log1,
-              ),
-              title: const Text(
-                'Profile',
-                style: TextStyle(
-                  fontFamily: 'LibreRegular',
-                ),
-              ),
-            ),
-            ListTile(
-              leading: Icon(
-                Icons.add_outlined,
-                color: log1,
-              ),
-              title: const Text(
-                'Add Perfume',
-                style: TextStyle(
-                  fontFamily: 'LibreRegular',
-                ),
-              ),
-            ),
-            ListTile(
-              onTap: _logout,
-              leading: Icon(
-                Icons.logout_rounded,
-                color: log1,
-              ),
-              title: const Text(
-                'Logout',
-                style: TextStyle(
-                  fontFamily: 'LibreRegular',
-                ),
-              ),
-            ),
-          ],
-        ),
+      drawer: AppDrawer(
+        onLogout: () => logout(context),
       ),
       body: Consumer<CategoryProvider>(
         builder: (context, viewModel, child) {
@@ -233,8 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   for (int i = 0; i < imageUrls.length; i++)
-                    if (i == _currentPage) ...[_buildIndicator(true)] else
-                      _buildIndicator(false),
+                    Indicator(isActive: i == _currentPage),
                 ],
               ),
               const SizedBox(height: 20),

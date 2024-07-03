@@ -1,14 +1,23 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:perfumes_app/model/purchased_model.dart';
 
 class OrdersService {
   final DatabaseReference _ordersRef = FirebaseDatabase.instance.ref('orders');
 
+  String getUserOrdersPath() {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) {
+      throw Exception('No user is logged in');
+    }
+    return 'users/$userId/orders';
+  }
+
   // Add a new order
   Future<void> addOrder(PurchasedItem item) async {
     try {
-      final orderRef =
-          _ordersRef.child(item.itemId!); // Reference to a specific item
+      final orderRef = FirebaseDatabase.instance.ref(
+          '${getUserOrdersPath()}/${item.itemId}'); // Reference to a specific item for the current user
       await orderRef.set({
         'itemId': item.itemId,
         'itemName': item.itemName,
@@ -23,21 +32,22 @@ class OrdersService {
     }
   }
 
-  // Get all orders
+  // Get all orders for the current user
   Future<List<PurchasedItem>> getAllOrders() async {
     try {
-      final snapshot = await _ordersRef.once();
+      final snapshot =
+          await FirebaseDatabase.instance.ref(getUserOrdersPath()).once();
       final data = snapshot.snapshot.value as Map?;
       if (data != null) {
         return data.entries.map((entry) {
           final itemData = entry.value as Map;
           return PurchasedItem(
-            itemId: itemData['itemId'] as String?,
-            itemName: itemData['itemName'] as String,
-            image: itemData['image'] as String,
-            price: itemData['price'] as int,
-            description: itemData['description'] as String,
-            quantity: itemData['quantity'] as int,
+            itemId: itemData['itemId'],
+            itemName: itemData['itemName'],
+            image: itemData['image'],
+            price: itemData['price'],
+            description: itemData['description'],
+            quantity: itemData['quantity'],
           );
         }).toList();
       } else {
@@ -49,10 +59,11 @@ class OrdersService {
     }
   }
 
-  // Update an existing order
+  // Update an existing order for the current user
   Future<void> updateOrder(PurchasedItem item) async {
     try {
-      final orderRef = _ordersRef.child(item.itemId!);
+      final orderRef = FirebaseDatabase.instance
+          .ref('${getUserOrdersPath()}/${item.itemId}');
       await orderRef.update({
         'itemName': item.itemName,
         'image': item.image,
@@ -66,10 +77,11 @@ class OrdersService {
     }
   }
 
-  // Delete an existing order
+  // Delete an existing order for the current user
   Future<void> deleteOrder(String itemId) async {
     try {
-      final orderRef = _ordersRef.child(itemId);
+      final orderRef =
+          FirebaseDatabase.instance.ref('${getUserOrdersPath()}/$itemId');
       await orderRef.remove();
       print('Order deleted with ID: $itemId');
     } catch (e) {

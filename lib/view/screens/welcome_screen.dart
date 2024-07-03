@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:perfumes_app/view/screens/login_screen.dart';
 import 'package:perfumes_app/view/screens/signup_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
@@ -14,7 +15,7 @@ class WelcomeScreen extends StatelessWidget {
         if (details.primaryDelta! < -5) {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => SignupScreen()),
+            MaterialPageRoute(builder: (context) => LoginScreen()),
           );
         }
       },

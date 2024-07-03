@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
-import 'package:perfumes_app/core/constants/colors.dart';
+
 import 'package:perfumes_app/model/category_model.dart';
 import 'package:perfumes_app/model/purchased_model.dart';
 import 'package:perfumes_app/view/screens/purchase_screen.dart';
 import 'package:perfumes_app/view_model/orders_service.dart';
-import 'package:perfumes_app/view_model/purchase_provider.dart';
 import 'package:uuid/uuid.dart';
 
 class CartScreen extends StatefulWidget {
@@ -19,50 +17,13 @@ class CartScreen extends StatefulWidget {
 
 class _CartScreenState extends State<CartScreen> {
   int _quantity = 1;
-  final OrdersService _ordersService =
-      OrdersService(); // Instantiate OrdersService
-  final Uuid _uuid = Uuid(); // Instantiate Uuid for generating unique IDs
-
-  void _incrementQuantity() {
-    setState(() {
-      _quantity++;
-    });
-  }
-
-  void _decrementQuantity() {
-    if (_quantity > 1) {
-      setState(() {
-        _quantity--;
-      });
-    }
-  }
-
-  Future<void> _addToCart() async {
-    final itemId = _uuid.v4(); // Generate a unique ID
-    final purchasedItem = PurchasedItem(
-      itemId: itemId,
-      itemName: widget.item.name,
-      image: widget.item.image,
-      price: widget.item.price,
-      description: widget.item.description,
-      quantity: _quantity,
-    );
-
-    final box = Hive.box<PurchasedItem>('cartBox');
-    await box.add(purchasedItem);
-
-    await _ordersService.addOrder(purchasedItem); // Add the item to Firebase
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => MyPurchasedScreen(),
-      ),
-    );
-  }
+  final OrdersService _ordersService = OrdersService();
+  final Uuid _uuid = Uuid();
 
   @override
   Widget build(BuildContext context) {
+    final totalPrice = widget.item.price * _quantity;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -100,8 +61,8 @@ class _CartScreenState extends State<CartScreen> {
               ),
               const SizedBox(height: 16),
               Text(
-                '\$${widget.item.price}',
-                style: TextStyle(
+                '\$${totalPrice.toStringAsFixed(2)}',
+                style: const TextStyle(
                   fontFamily: 'LibreRegular',
                   fontSize: 24,
                   color: Colors.black,
@@ -165,5 +126,40 @@ class _CartScreenState extends State<CartScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _addToCart() async {
+    final itemId = _uuid.v4();
+    final purchasedItem = PurchasedItem(
+      itemId: itemId,
+      itemName: widget.item.name,
+      image: widget.item.image,
+      price: widget.item.price,
+      description: widget.item.description,
+      quantity: _quantity,
+    );
+
+    await _ordersService.addOrder(purchasedItem);
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MyPurchasedScreen(),
+      ),
+    );
+  }
+
+  void _incrementQuantity() {
+    setState(() {
+      _quantity++;
+    });
+  }
+
+  void _decrementQuantity() {
+    if (_quantity > 1) {
+      setState(() {
+        _quantity--;
+      });
+    }
   }
 }

@@ -5,7 +5,8 @@ part 'purchased_model.g.dart';
 @HiveType(typeId: 1)
 class PurchasedItem extends HiveObject {
   @HiveField(0)
-  final String? itemId;
+  String? itemId;
+
   @HiveField(1)
   final String itemName;
 
@@ -21,6 +22,9 @@ class PurchasedItem extends HiveObject {
   @HiveField(5)
   final int quantity;
 
+  @HiveField(6)
+  String? userId;
+
   PurchasedItem({
     this.itemId,
     required this.itemName,
@@ -28,7 +32,9 @@ class PurchasedItem extends HiveObject {
     required this.price,
     required this.description,
     required this.quantity,
+    this.userId,
   });
+
   Map<String, dynamic> toMap() {
     return {
       'itemId': itemId,
@@ -37,6 +43,7 @@ class PurchasedItem extends HiveObject {
       'price': price,
       'description': description,
       'quantity': quantity,
+      'userId': userId,
     };
   }
 
@@ -48,6 +55,7 @@ class PurchasedItem extends HiveObject {
       price: map['price'],
       description: map['description'],
       quantity: map['quantity'],
+      userId: map['userId'],
     );
   }
 }

@@ -5,6 +5,7 @@ import 'package:perfumes_app/core/state_management/user_session.dart';
 import 'package:perfumes_app/data/hive_helper.dart';
 import 'package:perfumes_app/model/user_model.dart';
 import 'package:hive/hive.dart';
+import 'package:perfumes_app/view_model/orders_service.dart';
 
 class AuthService {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -187,5 +188,9 @@ class AuthService {
       await updateUserRealTime(user);
       print("User data updated in real-time database");
     }
+  }
+
+  static OrdersService getOrdersService() {
+    return OrdersService();
   }
 }
