@@ -15,8 +15,11 @@ class UserModel extends HiveObject {
 
   @HiveField(3)
   String? email;
+  @HiveField(4)
+  String? userImage;
 
-  UserModel({this.uid, this.name, this.phoneNumber, this.email});
+  UserModel(
+      {this.uid, this.name, this.phoneNumber, this.email, this.userImage});
 
   Map<String, dynamic> toMap() {
     return {
@@ -24,15 +27,16 @@ class UserModel extends HiveObject {
       'name': name,
       'phoneNumber': phoneNumber,
       'email': email,
+      'userImage': userImage
     };
   }
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
     return UserModel(
-      uid: map['uid'],
-      name: map['name'],
-      phoneNumber: map['phoneNumber'],
-      email: map['email'],
-    );
+        uid: map['uid'],
+        name: map['name'],
+        phoneNumber: map['phoneNumber'],
+        email: map['email'],
+        userImage: map['userImage']);
   }
 }

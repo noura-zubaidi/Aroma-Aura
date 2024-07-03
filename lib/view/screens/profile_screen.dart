@@ -158,7 +158,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           'Name: ${_user!.name}',
                           style: const TextStyle(
                             fontFamily: 'LibreBold',
-                            fontSize: 17,
+                            fontSize: 19,
                             color: Colors.black,
                           ),
                         ),
@@ -169,8 +169,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: Text(
                           'Phone Number: +962 ${_user!.phoneNumber}',
                           style: const TextStyle(
-                            fontFamily: 'LibreRegular',
-                            fontSize: 15,
+                            fontFamily: 'LibreBold',
+                            fontSize: 19,
                             color: Colors.black,
                           ),
                         ),
@@ -180,7 +180,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         'Email: ${_user!.email}',
                         style: const TextStyle(
                           fontFamily: 'LibreRegular',
-                          fontSize: 15,
+                          fontSize: 16,
                           color: Colors.black,
                         ),
                       ),

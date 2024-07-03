@@ -38,8 +38,8 @@ class ItemsScreen extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(30)),
+                decoration:
+                    BoxDecoration(borderRadius: BorderRadius.circular(30)),
                 width: double.infinity,
                 child: Row(
                   children: [
@@ -60,8 +60,8 @@ class ItemsScreen extends StatelessWidget {
                           Text(
                             item.name,
                             style: const TextStyle(
-                              fontFamily: 'LibreRegular',
-                              fontSize: 16,
+                              fontFamily: 'LibreBold',
+                              fontSize: 19,
                               color: Colors.black,
                             ),
                           ),
@@ -70,7 +70,7 @@ class ItemsScreen extends StatelessWidget {
                             '\$${item.price}',
                             style: const TextStyle(
                               fontFamily: 'LibreRegular',
-                              fontSize: 12,
+                              fontSize: 15,
                               color: Colors.black,
                             ),
                           ),

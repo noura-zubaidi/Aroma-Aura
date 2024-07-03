@@ -13,11 +13,10 @@ class OrdersService {
     return 'users/$userId/orders';
   }
 
-  // Add a new order
   Future<void> addOrder(PurchasedItem item) async {
     try {
-      final orderRef = FirebaseDatabase.instance.ref(
-          '${getUserOrdersPath()}/${item.itemId}'); // Reference to a specific item for the current user
+      final orderRef = FirebaseDatabase.instance
+          .ref('${getUserOrdersPath()}/${item.itemId}');
       await orderRef.set({
         'itemId': item.itemId,
         'itemName': item.itemName,
@@ -32,7 +31,6 @@ class OrdersService {
     }
   }
 
-  // Get all orders for the current user
   Future<List<PurchasedItem>> getAllOrders() async {
     try {
       final snapshot =
@@ -59,7 +57,6 @@ class OrdersService {
     }
   }
 
-  // Update an existing order for the current user
   Future<void> updateOrder(PurchasedItem item) async {
     try {
       final orderRef = FirebaseDatabase.instance
@@ -77,7 +74,6 @@ class OrdersService {
     }
   }
 
-  // Delete an existing order for the current user
   Future<void> deleteOrder(String itemId) async {
     try {
       final orderRef =
